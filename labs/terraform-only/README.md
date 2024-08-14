@@ -4,7 +4,7 @@ This tutorial will guide you through setting up a local Kubernetes environment u
 
 ## Table of Contents
 
-1. [Prerequisites](#prerequisites)
+1. [Prerequisites](./index.md)
 2. [Project Structure](#project-structure)
 3. [Setting Up the Local Environment](#setting-up-the-local-environment)
 4. [Creating the Application Components](#creating-the-application-components)
@@ -13,7 +13,6 @@ This tutorial will guide you through setting up a local Kubernetes environment u
 7. [Deployment Process](#deployment-process)
 8. [Testing the Application](#testing-the-application)
 9. [Troubleshooting](#troubleshooting)
-
 
 ## Project Structure
 
@@ -57,12 +56,12 @@ npx create-react-app .
 2. Replace the contents of `src/App.js` with:
 
 ```jsx
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 function App() {
-  const [message, setMessage] = useState('');
-  const [inputText, setInputText] = useState('');
+  const [message, setMessage] = useState("");
+  const [inputText, setInputText] = useState("");
 
   useEffect(() => {
     fetchMessage();
@@ -70,21 +69,23 @@ function App() {
 
   const fetchMessage = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/message');
+      const response = await axios.get("http://localhost:3000/api/message");
       setMessage(response.data.message);
     } catch (error) {
-      console.error('Error fetching message:', error);
+      console.error("Error fetching message:", error);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:3000/api/message', { text: inputText });
+      await axios.post("http://localhost:3000/api/message", {
+        text: inputText,
+      });
       fetchMessage();
-      setInputText('');
+      setInputText("");
     } catch (error) {
-      console.error('Error submitting message:', error);
+      console.error("Error submitting message:", error);
     }
   };
 
@@ -121,40 +122,42 @@ npm install express pg cors
 2. Create `server.js` with the following content:
 
 ```javascript
-const express = require('express');
-const { Pool } = require('pg');
-const cors = require('cors');
+const express = require("express");
+const { Pool } = require("pg");
+const cors = require("cors");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 const pool = new Pool({
-  user: 'postgres',
-  host: 'postgres',
-  database: 'myapp',
-  password: 'password',
+  user: "postgres",
+  host: "postgres",
+  database: "myapp",
+  password: "password",
   port: 5432,
 });
 
-app.get('/api/message', async (req, res) => {
+app.get("/api/message", async (req, res) => {
   try {
-    const result = await pool.query('SELECT text FROM messages ORDER BY id DESC LIMIT 1');
-    res.json({ message: result.rows[0]?.text || 'No messages yet' });
+    const result = await pool.query(
+      "SELECT text FROM messages ORDER BY id DESC LIMIT 1",
+    );
+    res.json({ message: result.rows[0]?.text || "No messages yet" });
   } catch (error) {
-    console.error('Error fetching message:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error fetching message:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
-app.post('/api/message', async (req, res) => {
+app.post("/api/message", async (req, res) => {
   try {
     const { text } = req.body;
-    await pool.query('INSERT INTO messages (text) VALUES ($1)', [text]);
-    res.status(201).json({ message: 'Message saved successfully' });
+    await pool.query("INSERT INTO messages (text) VALUES ($1)", [text]);
+    res.status(201).json({ message: "Message saved successfully" });
   } catch (error) {
-    console.error('Error saving message:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error saving message:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -421,30 +424,37 @@ kubectl run -n myapp postgres-init --rm --tty -i --restart='Never' \
 If you encounter issues, try these troubleshooting steps:
 
 1. Check pod status:
+
    ```bash
    kubectl get pods -n myapp
    ```
 
 2. View pod logs:
+
    ```bash
    kubectl logs -n myapp <pod-name>
    ```
 
 3. Access the backend directly:
+
    ```bash
    kubectl port-forward -n myapp service/backend 3000:3000
    ```
+
    Then, in another terminal:
+
    ```bash
    curl http://localhost:3000/api/message
    ```
 
 4. Check database connectivity:
+
    ```bash
    kubectl exec -it -n myapp <postgres-pod-name> -- psql -U postgres -d myapp -c "SELECT * FROM messages;"
    ```
 
 5. Review Terraform state:
+
    ```bash
    terraform show
    ```
