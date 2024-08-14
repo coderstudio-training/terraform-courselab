@@ -48,3 +48,8 @@ If you're feeling adventurous, implement an Ingress resource to route traffic to
 3. Update your application to work with the new Ingress routing.
 
 Remember to test your changes thoroughly and ensure that your Terraform configuration remains valid throughout these exercises.
+
+<details>
+  <summary>🎯 Solution</summary>
+  <a href="exercises/solution-part-1/README.md" target="_blank">Show me! </a>
+</details>

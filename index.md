@@ -16,6 +16,11 @@ Ensure you have the following installed on your local machine:
 - [Local K3s Tutorial with Terraform](labs/terraform-only/README.md)
 
 
-## Part 1. Terraform and Ansible
+## Part 2. Terraform and Ansible
 
 - [Local K3s Tutorial with Terraform and Ansible](labs/terraform-ansible/README.md)
+
+## Part 3. Exercises
+
+- [K3s and Terraform Exercises](exercises/terraform-only/README.md)
+- [K3s Terraform and Ansible Exercises](exercises/terraform-ansible/README.md)

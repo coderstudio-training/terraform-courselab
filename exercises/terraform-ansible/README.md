@@ -53,3 +53,10 @@ Set up a basic monitoring and logging stack.
 4. Implement alerts in Prometheus and use Ansible to configure alert routing.
 
 Remember to test your changes thoroughly and ensure that both Terraform and Ansible remain idempotent throughout these exercises.
+
+
+
+<details>
+  <summary>🎯 Solution</summary>
+  <a href="exercises/solution-part-1/README.md" target="_blank">Show me! </a>
+</details>
