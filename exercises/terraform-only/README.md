@@ -51,4 +51,4 @@ Remember to test your changes thoroughly and ensure that your Terraform configur
 
 ---
 
-Feeling stuck? Click [here](/exercises/solution-part-1/README.md) to see the solution
+Feeling stuck? Click [here](/exercises/solution-part-1/README.md){:target="_blank"} to see the solution

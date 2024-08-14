@@ -55,4 +55,4 @@ Set up a basic monitoring and logging stack.
 Remember to test your changes thoroughly and ensure that both Terraform and Ansible remain idempotent throughout these exercises.
 
 ---
-Feeling stuck? Click [here](/exercises/solution-part-2/README.md) to see the solution
+Feeling stuck? Click [here](/exercises/solution-part-2/README.md){:target="_blank"} to see the solution
