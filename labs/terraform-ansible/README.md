@@ -4,7 +4,7 @@ This tutorial will guide you through setting up a local Kubernetes environment u
 
 ## Table of Contents
 
-1. [Prerequisites](./index.md)
+1. [Prerequisites](./)
 2. [Project Structure](#project-structure)
 3. [Setting Up the Local Environment](#setting-up-the-local-environment)
 4. [Creating the Application Components](#creating-the-application-components)
