@@ -49,7 +49,8 @@ If you're feeling adventurous, implement an Ingress resource to route traffic to
 
 Remember to test your changes thoroughly and ensure that your Terraform configuration remains valid throughout these exercises.
 
+---
 <details>
   <summary>🎯 Solution</summary>
-  <a href="exercises/solution-part-1/README.md" target="_blank">Show me! </a>
+  <a href="exercises/solution-part-1/README.md" target="_blank">Show me!</a>
 </details>
