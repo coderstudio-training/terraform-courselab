@@ -412,7 +412,7 @@ build:
 
 test:
   stage: test
-  image: node:14
+  image: node:20-alpine
   script:
     - npm install
     - npm test

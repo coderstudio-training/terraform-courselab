@@ -104,6 +104,60 @@ Ansible doesn't run natively on Windows. The recommended approach is to use Wind
    ansible --version
    ```
 
+
+
+# Comparison Chart: Deployment With and Without Ansible
+
+| Aspect | With Ansible | Without Ansible |
+|--------|--------------|-----------------|
+| **Setup Process** | Automated via playbook | Manual execution of commands |
+| **Reproducibility** | High - playbook ensures consistent setup | Lower - depends on following documentation accurately |
+| **Time Efficiency** | Fast - runs all steps automatically | Slower - requires manual intervention for each step |
+| **Error Handling** | Built-in error handling and reporting | Manual error checking required |
+| **Idempotency** | Ensures system state, can be run multiple times safely | Manual checks needed to avoid duplicate actions |
+| **Learning Curve** | Requires learning Ansible syntax | Requires familiarity with individual tools and commands |
+| **Flexibility** | Can easily modify playbook for different environments | Might need separate scripts for different environments |
+| **Documentation** | Playbook serves as executable documentation | Separate documentation needed |
+| **Version Control** | Easy to version control Ansible playbooks | Need to version control multiple scripts or documentation |
+| **Scalability** | Easily scalable to multiple servers | More challenging to scale manually |
+
+## Pros and Cons
+
+### With Ansible
+
+Pros:
+1. Automation reduces human error
+2. Consistent and reproducible deployments
+3. Time-efficient for repeated deployments
+4. Built-in idempotency
+5. Serves as self-documenting infrastructure
+6. Easy to maintain and update
+
+Cons:
+1. Initial learning curve for Ansible
+2. Overhead of installing and maintaining Ansible
+3. May be overkill for very simple deployments
+4. Debugging Ansible itself can be challenging
+
+### Without Ansible
+
+Pros:
+1. No need to learn Ansible syntax
+2. Direct control over each step of the process
+3. No additional tool dependencies
+4. Potentially simpler for very basic deployments
+
+Cons:
+1. More prone to human error
+2. Time-consuming for repeated deployments
+3. Harder to maintain consistency across environments
+4. Manual documentation required and may become outdated
+5. Scaling to multiple servers is more challenging
+6. No built-in error handling or reporting
+
+
+
+
 ## Part 1. Terraform only
 
 - [Local K3s Tutorial with Terraform](labs/terraform-only/README.md)
@@ -112,7 +166,19 @@ Ansible doesn't run natively on Windows. The recommended approach is to use Wind
 
 - [Local K3s Tutorial with Terraform and Ansible](labs/terraform-ansible/README.md)
 
-## Part 3. Exercises
+## Part 3. Deploying TypeScript (with Ansible)
+
+- [Deploying a TypeScript Stack on K3s with Terraform and Ansible](labs/typescript/README.md)
+
+## Part 4. Deploying TypeScript (without Ansible)
+
+- [Deploying a TypeScript Stack on K3s with Terraform](labs/typescript/without-ansible.md)
+
+## Part 5. Deploying to AWS
+
+- [Deploying a 3-Tier Web Application](labs/AWS/3-tier.md)
+
+## Part 6. Exercises
 
 - [K3s and Terraform Exercises](exercises/terraform-only/README.md)
 - [K3s Terraform and Ansible Exercises](exercises/terraform-ansible/README.md)

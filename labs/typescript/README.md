@@ -1,23 +1,34 @@
-# Local K3s Tutorial with Terraform and Ansible
+# Deploying a TypeScript Stack on K3s with Terraform and Ansible
 
-This tutorial will guide you through setting up a local Kubernetes environment using k3s, Terraform, and Ansible. We'll deploy a full-stack application consisting of a React frontend, Node.js backend, and PostgreSQL database.
+This guide will walk you through the process of setting up and deploying a full-stack TypeScript application on a local Kubernetes (k3s) cluster, using Terraform for infrastructure management and Ansible for automation.
 
 ## Table of Contents
 
-1. [Prerequisites](https://terraform-courselab.coderstudio.co/)
+1. [Prerequisites](#prerequisites)
 2. [Project Structure](#project-structure)
 3. [Setting Up the Local Environment](#setting-up-the-local-environment)
-4. [Creating the Application Components](#creating-the-application-components)
-5. [Containerizing the Applications](#containerizing-the-applications)
-6. [Configuring Terraform](#configuring-terraform)
-7. [Creating Ansible Playbooks](#creating-ansible-playbooks)
-8. [Deployment Process](#deployment-process)
-9. [Testing the Application](#testing-the-application)
-10. [Troubleshooting](#troubleshooting)
+4. [Frontend Setup (React with TypeScript)](#frontend-setup-react-with-typescript)
+5. [Backend Setup (Node.js with TypeScript)](#backend-setup-nodejs-with-typescript)
+6. [Database Setup (PostgreSQL)](#database-setup-postgresql)
+7. [Containerization with Docker](#containerization-with-docker)
+8. [Infrastructure as Code with Terraform](#infrastructure-as-code-with-terraform)
+9. [Automation with Ansible](#automation-with-ansible)
+10. [Deployment Process](#deployment-process)
+11. [Testing the Application](#testing-the-application)
+12. [Troubleshooting](#troubleshooting)
+
+## Prerequisites
+
+Ensure you have the following installed on your local machine:
+- Docker
+- Terraform
+- Ansible
+- kubectl
+- Node.js and npm
 
 ## Project Structure
 
-Create the following directory structure for your project:
+Create the following directory structure:
 
 ```
 project-root/
@@ -36,7 +47,7 @@ project-root/
 curl -sfL https://get.k3s.io | sh -
 ```
 
-2. Set up kubectl to use k3s:
+2. Configure kubectl:
 
 ```bash
 mkdir ~/.kube
@@ -44,26 +55,34 @@ sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
 sudo chown $USER:$USER ~/.kube/config
 ```
 
-## Creating the Application Components
+## Frontend Setup (React with TypeScript)
 
-### Frontend (React)
-
-1. Navigate to the `frontend` directory and create a new React app:
+1. Create a new React app with TypeScript:
 
 ```bash
+npx create-react-app frontend --template typescript
 cd frontend
-npx create-react-app .
 ```
 
-2. Replace the contents of `src/App.js` with:
+2. Install additional dependencies:
 
-```jsx
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+```bash
+npm install axios
+```
+
+3. Replace the contents of `src/App.tsx` with:
+
+```tsx
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+interface Message {
+  text: string;
+}
 
 function App() {
-  const [message, setMessage] = useState("");
-  const [inputText, setInputText] = useState("");
+  const [message, setMessage] = useState<string>('');
+  const [inputText, setInputText] = useState<string>('');
 
   useEffect(() => {
     fetchMessage();
@@ -71,29 +90,27 @@ function App() {
 
   const fetchMessage = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/api/message");
-      setMessage(response.data.message);
+      const response = await axios.get<Message>('http://localhost:3000/api/message');
+      setMessage(response.data.text);
     } catch (error) {
-      console.error("Error fetching message:", error);
+      console.error('Error fetching message:', error);
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:3000/api/message", {
-        text: inputText,
-      });
+      await axios.post<Message>('http://localhost:3000/api/message', { text: inputText });
       fetchMessage();
-      setInputText("");
+      setInputText('');
     } catch (error) {
-      console.error("Error submitting message:", error);
+      console.error('Error submitting message:', error);
     }
   };
 
   return (
     <div>
-      <h1>K3s React App</h1>
+      <h1>K3s React App with TypeScript</h1>
       <p>Message from server: {message}</p>
       <form onSubmit={handleSubmit}>
         <input
@@ -111,55 +128,71 @@ function App() {
 export default App;
 ```
 
-### Backend (Node.js)
+## Backend Setup (Node.js with TypeScript)
 
-1. Navigate to the `backend` directory and initialize a new Node.js project:
+1. Set up a new Node.js project with TypeScript:
 
 ```bash
-cd ../backend
+mkdir backend && cd backend
 npm init -y
 npm install express pg cors
+npm install --save-dev typescript @types/express @types/pg @types/cors ts-node
+npx tsc --init
 ```
 
-2. Create `server.js` with the following content:
+2. Update `tsconfig.json`:
 
-```javascript
-const express = require("express");
-const { Pool } = require("pg");
-const cors = require("cors");
+```json
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true
+  },
+  "include": ["src/**/*"]
+}
+```
+
+3. Create `src/server.ts`:
+
+```typescript
+import express, { Request, Response } from 'express';
+import { Pool } from 'pg';
+import cors from 'cors';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 const pool = new Pool({
-  user: "postgres",
-  host: "postgres",
-  database: "myapp",
-  password: "password",
+  user: 'postgres',
+  host: 'postgres',
+  database: 'myapp',
+  password: 'password',
   port: 5432,
 });
 
-app.get("/api/message", async (req, res) => {
+app.get('/api/message', async (req: Request, res: Response) => {
   try {
-    const result = await pool.query(
-      "SELECT text FROM messages ORDER BY id DESC LIMIT 1",
-    );
-    res.json({ message: result.rows[0]?.text || "No messages yet" });
+    const result = await pool.query('SELECT text FROM messages ORDER BY id DESC LIMIT 1');
+    res.json({ text: result.rows[0]?.text || 'No messages yet' });
   } catch (error) {
-    console.error("Error fetching message:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error('Error fetching message:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-app.post("/api/message", async (req, res) => {
+app.post('/api/message', async (req: Request, res: Response) => {
   try {
     const { text } = req.body;
-    await pool.query("INSERT INTO messages (text) VALUES ($1)", [text]);
-    res.status(201).json({ message: "Message saved successfully" });
+    await pool.query('INSERT INTO messages (text) VALUES ($1)', [text]);
+    res.status(201).json({ message: 'Message saved successfully' });
   } catch (error) {
-    console.error("Error saving message:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error('Error saving message:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -169,9 +202,23 @@ app.listen(port, () => {
 });
 ```
 
-## Containerizing the Applications
+4. Update `package.json` scripts:
 
-1. In the `frontend` directory, create a `Dockerfile`:
+```json
+"scripts": {
+  "start": "node dist/server.js",
+  "build": "tsc",
+  "dev": "ts-node src/server.ts"
+}
+```
+
+## Database Setup (PostgreSQL)
+
+We'll use a PostgreSQL container in our k3s cluster. The setup will be handled by Terraform and Ansible in later steps.
+
+## Containerization with Docker
+
+1. Create a `Dockerfile` in the frontend directory:
 
 ```dockerfile
 FROM node:20-alpine as build
@@ -187,7 +234,7 @@ EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 ```
 
-2. In the `backend` directory, create a `Dockerfile`:
+2. Create a `Dockerfile` in the backend directory:
 
 ```dockerfile
 FROM node:20-alpine
@@ -195,13 +242,14 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
+RUN npm run build
 EXPOSE 3000
-CMD ["node", "server.js"]
+CMD ["npm", "start"]
 ```
 
-## Configuring Terraform
+## Infrastructure as Code with Terraform
 
-1. Navigate to the `terraform` directory and create `main.tf`:
+1. In the `terraform` directory, create `main.tf`:
 
 ```hcl
 terraform {
@@ -377,9 +425,9 @@ resource "kubernetes_service" "frontend" {
 }
 ```
 
-## Creating Ansible Playbooks
+## Automation with Ansible
 
-1. Navigate to the `ansible` directory and create `playbook.yml`:
+1. In the `ansible` directory, create `playbook.yml`:
 
 ```yaml
 ---
@@ -405,13 +453,15 @@ resource "kubernetes_service" "frontend" {
         remote_src: yes
         owner: "{{ ansible_user_id }}"
         group: "{{ ansible_user_id }}"
-        mode: "0600"
+        mode: '0600'
 
     - name: Build frontend Docker image
       docker_image:
         name: frontend
         build:
           path: ../frontend
+          args:
+            NODE_ENV: production
         source: build
         force_source: yes
 
@@ -420,6 +470,8 @@ resource "kubernetes_service" "frontend" {
         name: backend
         build:
           path: ../backend
+          args:
+            NODE_ENV: production
         source: build
         force_source: yes
 
@@ -438,14 +490,14 @@ resource "kubernetes_service" "frontend" {
             namespace: myapp
           spec:
             containers:
-              - name: postgres-init
-                image: postgres:13
-                command: ["/bin/sh", "-c"]
-                args:
-                  - psql -h postgres -U postgres -d myapp -c "CREATE TABLE IF NOT EXISTS messages (id SERIAL PRIMARY KEY, text TEXT NOT NULL);"
-                env:
-                  - name: PGPASSWORD
-                    value: password
+            - name: postgres-init
+              image: postgres:13
+              command: ["/bin/sh", "-c"]
+              args:
+                - psql -h postgres -U postgres -d myapp -c "CREATE TABLE IF NOT EXISTS messages (id SERIAL PRIMARY KEY, text TEXT NOT NULL);"
+              env:
+                - name: PGPASSWORD
+                  value: password
       register: postgres_init
 
     - name: Wait for PostgreSQL initialization
@@ -471,10 +523,9 @@ resource "kubernetes_service" "frontend" {
 ansible-playbook -i localhost, ansible/playbook.yml
 ```
 
-This playbook will:
-
+This will:
 - Ensure Docker and k3s are installed
-- Build the Docker images for frontend and backend
+- Build Docker images for frontend and backend
 - Apply the Terraform configuration
 - Initialize the PostgreSQL database
 
@@ -490,40 +541,33 @@ This playbook will:
 
 ## Troubleshooting
 
-If you encounter issues, try these troubleshooting steps:
+If you encounter issues:
 
 1. Check pod status:
-
    ```bash
    kubectl get pods -n myapp
    ```
 
 2. View pod logs:
-
    ```bash
    kubectl logs -n myapp <pod-name>
    ```
 
 3. Access the backend directly:
-
    ```bash
    kubectl port-forward -n myapp service/backend 3000:3000
    ```
-
    Then, in another terminal:
-
    ```bash
    curl http://localhost:3000/api/message
    ```
 
 4. Check database connectivity:
-
    ```bash
    kubectl exec -it -n myapp <postgres-pod-name> -- psql -U postgres -d myapp -c "SELECT * FROM messages;"
    ```
 
 5. Review Terraform state:
-
    ```bash
    cd terraform && terraform show
    ```
@@ -532,3 +576,14 @@ If you encounter issues, try these troubleshooting steps:
    ```bash
    ansible-playbook -i localhost, ansible/playbook.yml --check --diff
    ```
+
+7. For TypeScript-specific issues:
+   - Check compilation errors:
+     ```bash
+     cd frontend && npm run build
+     cd ../backend && npm run build
+     ```
+   - Verify TypeScript configs:
+     ```bash
+     cat tsconfig.json
+     ```

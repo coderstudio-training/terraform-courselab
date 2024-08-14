@@ -4,7 +4,7 @@ This tutorial will guide you through setting up a local Kubernetes environment u
 
 ## Table of Contents
 
-1. [Prerequisites](/index.md)
+1. [Prerequisites](https://terraform-courselab.coderstudio.co/)
 2. [Project Structure](#project-structure)
 3. [Setting Up the Local Environment](#setting-up-the-local-environment)
 4. [Creating the Application Components](#creating-the-application-components)
@@ -172,7 +172,7 @@ app.listen(port, () => {
 1. In the `frontend` directory, create a `Dockerfile`:
 
 ```dockerfile
-FROM node:14 as build
+FROM node:20-alpine as build
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
@@ -188,7 +188,7 @@ CMD ["nginx", "-g", "daemon off;"]
 2. In the `backend` directory, create a `Dockerfile`:
 
 ```dockerfile
-FROM node:14
+FROM node:20-alpine
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
